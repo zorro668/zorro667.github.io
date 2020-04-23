@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title>ZORRO</title>
+		<link rel="stylesheet" href="stylesheet/common.css" />
+		<link rel="stylesheet" href="stylesheet/style.css" />
+		<link rel="icon" type="image/x-icon" href='images/favicon.ico' />
+		<script type="text/javascript" src="javascript/jquery.js"></script>
+		<script type="text/javascript" src="javascript/language.js"></script>
+		<script type="text/javascript" src="javascript/vue.js"></script>
+		<script type="text/javascript" src="javascript/global.js"></script>
+		<script type="text/javascript" src="javascript/data.js"></script>
+		<script type="text/javascript" src="javascript/web3.min.js"></script>
+		<script type="text/javascript" src="javascript/truffle-contract.js"></script>
+		<script type="text/javascript" src="javascript/clipboard.min.js.js"></script>
+		<script type="text/javascript" src="javascript/abi.js"></script>
+		<script type="text/javascript">var s="https://etherscan.io",g = "https://github.com/",v = "logo.png";</script>
+	</head>
+
+	<body>
+		<div id="app" v-cloak class="line_bg">
+
+			<div class="header">
+				<!--header start-->
+
+				<div class="container">
+					<div class="nav_btn" @click="displayMenu">
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+
+					<div class="nav">
+						<ul>
+							<li v-for="(value,index) in langList" @click="changeLang(index)">{{value}}</li>
+						</ul>
+					</div>
+
+					<div class="nav_mobile" v-show="menu">
+						<div class="bg">
+							<ul>
+								<li v-for="(value,index) in langList" @click="changeLang(index)">{{value}}</li>
+							</ul>
+						</div>
+					</div>
+
+					
+				<div class="market mt30">
+					<h3>{{langItem.token.market}}</h3>
+					<p>1 ETH = <span>{{buyToken.ethRatio | numFilter }}</span> ZRO</p>
+					
+				</div>
+
+					<div class="intro box_border">
+							<a :href="whitePaper">{{langItem.game.whitePaper}}</a>
+							<a :href="video">{{langItem.game.video}}</a>
+							<a :href="ppt">{{langItem.game.ppt}}</a>
+					</div>
+
+				</div>
+
+			</div>
+			<!--header end-->
+
+			<div class="token"><!--buy token-->
+
+				
+
+				<div class="buy_token">
+
+					<div class="big_title">
+						<span></span>{{langItem.token.title}}<span></span>
+					</div>
+					<div class="container">
+
+						<div class="token_tab">
+							<ul class="tab_menu">
+								<li :class="tabData.tokenItem=='buy'?'active':' '" @click="tokenTab('buy')">{{langItem.token.buy}}</li>
+								<li :class="tabData.tokenItem=='my'?'active':' '" @click="tokenTab('my')">{{langItem.token.my}}</li>
+								<li :class="tabData.tokenItem=='rule'?'active':' '" @click="tokenTab('rule')">{{langItem.com.rule}}</li>
+							</ul>
+
+							<div class="token_box"  v-show="tabData.tokenItem=='buy'">
+								<div class="stage">
+									{{langItem.token.stage}}：
+									<span v-if="buyToken.layer>=12">{{langItem.token.fund[1]}}，</span>
+									<span v-else>{{langItem.token.fund[0]}}，L{{buyToken.layer}}，</span>
+									1ETH={{buyToken.ethRatio}} ZRO
+									<p>
+										<span v-if="buyToken.layer>=12">{{langItem.token.quota[0]}}</span>
+										<span v-else>{{langItem.token.quota[1]}}</span>
+										：{{buyToken.quoat}} ZRO
+									</p>
+								</div>
+
+								<div class="form_box">
+									<div class="input_box"><input type="number" placeholder="1" v-model.number="buyToken.ethNumber"  v-on:keyup="inputCount"/></div>
+									<span>ETH</span>
+									<div class="count">{{langItem.token.getToken}}：<em>{{buyToken.tokenCount | numFilter}}</em> ZRO</div>
+									<div class="balance">{{langItem.com.balance}}：<em>{{ethBalance | numFilter}}</em> ETH</div>
+								</div>
+
+								<div class="sub_btn"><button @click="toBuyToken">{{langItem.token.buy}}</button></div>
+							</div>
+
+							<div class="token_box"  v-show="tabData.tokenItem=='my'">
+								<div class="invite">
+									<ul>
+										<li>{{langItem.game.myID}}：{{playerID}}</li>
+
+										<li>{{langItem.game.share_count}}：{{team.direct.nodes}}</li>
+
+										<li>{{langItem.game.my_share}}：{{buyToken.pid}}</li>
+
+										<li>{{langItem.game.myAddress}}：{{buyToken.address}}</li>
+										<li>{{langItem.game.invite_link}}：<span id="url">{{formatURL}}</span></li>
+									</ul>
+								</div>
+								<div class="sub_btn"><button @click="copy" class="btn" data-clipboard-target="#url">{{langItem.game.copy}}</button></div>
+							</div>
+
+							<div class="token_box" v-show="tabData.tokenItem=='rule'">
+								<div class="rules">
+									<h3 class="rules_title">{{langItem.game.rule_title}}</h3>
+									<div class="rule_text">{{langItem.token.tokenRule}}</div>
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<!--buy token end-->
+
+			<div class="join_game mt30">
+				<!--game start-->
+				<div class="big_title">
+					<span></span>{{langItem.game.joinGame}}<span></span>
+				</div>
+				<div class="container">
+					<div class="game_box">
+
+						<h3 class="block_title">{{langItem.game.future}}</h3>
+						<div class="future_txt">
+							{{langItem.game.futureText}}
+						</div>
+
+						<div class="game_time">
+							<div class="countdown">{{langItem.game.countDown}}</div>
+							<div class="time" id="show"></div>
+							<div class="number">{{gameData.bonusPool | numFilter}} ETH</div>
+						</div>
+
+						<div class="invest_form">
+							
+							<h3 class="sub_title">{{langItem.game.join_title}}</h3>
+							<div class="item">
+								<ul>
+									<li v-for="(value,i) in tabData.investCount" @click="investTab(value)" :class="gameData.investNumber==value?'cur':' '">{{value}} ETH</li>
+								</ul>
+								<div class="clear"></div>
+								<div class="balance">{{langItem.com.balance}}：<em>{{ethBalance | numFilter}} ETH</em></div>
+							</div>
+
+							<div class="sub_btn"><button @click="investIn">{{langItem.game.join}}</button></div>
+							<div class="view_rules" @click="showPop('futureRule')"><span>{{langItem.game.viewRule}}</span></div>
+						</div>
+						
+
+						
+
+					</div>
+
+				</div>
+
+			</div>
+			<!--game end-->
+
+			<div class="ecology mt30">
+				<!--join start-->
+				<div class="container">
+
+					<div class="game_box">
+						<h3 class="block_title">{{langItem.game.ecology}}</h3>
+
+						<div class="tab">
+
+							<ul class="tab_nav">
+							    <li :class="tabData.ecologyItem=='join'?'active':' '" @click="clickTab('join')">{{langItem.game.quantify}}</li>
+								<li :class="tabData.ecologyItem=='record'?'active':' '" @click="clickTab('record')">{{langItem.game.record}}</li>
+								<li :class="tabData.ecologyItem=='tokenRule'?'active':' '" @click="clickTab('tokenRule')">{{langItem.com.rule}}</li>
+							</ul>
+							<div class="clear"></div>
+
+							<div class="tab_box"  v-show="tabData.ecologyItem=='join'">
+								
+
+								<div class="item">
+									<ul>
+										<li v-for="(value,i) in tabData.days" @click="daysTab(value)" :class="financial.joinDays==value?'cur':' '">{{value}} {{langItem.game.day}}</li>
+									</ul>
+									<div class="clear"></div>
+								</div>
+
+								<div class="form_box">
+									<div class="input_box"><input type="number" v-model.numbe="financial.quantity" /></div>
+									<span>ZRO</span>
+
+									<div class="balance">{{langItem.com.balance}}：<em>{{tokenBalance | numFilter}}</em> ZRO</div>
+								</div>
+
+								<div class="sub_btn"><button @click="storeToken">{{langItem.game.join}}</button></div>
+
+							</div>
+							
+
+							<div class="tab_box"  v-show="tabData.ecologyItem=='record'"><!--量化记录-->
+								<table width="100%" class="record" cellspacing="0" cellpadding="0">
+									<tr>
+										<th>{{langItem.game.time}}</th>
+										<th>{{langItem.game.count}}(ZRO)</th>
+										<th width="60">{{langItem.game.days}}</th>
+										<th width="110">{{langItem.game.status}}</th>
+									</tr>
+									<tr v-for="(value,i) in financial.record" v-if="value.redeemed==0">
+										<td>{{value.time | formatTimeStamp('MM-dd hh:mm')}}</td>
+										<td>{{value.count | numFilter}}<span>+{{value.income | numFilter}}</span></td>
+										<td>{{value.surplus}} / {{value.days}}</td>
+
+										<td>
+											<font v-if="value.surplus < value.days">{{langItem.game.processing}}</font>
+											<font v-if="value.isredeem==true">
+												<button class="btns" @click="redeemStoreToken(value.id)">{{langItem.game.redeem}}</button>
+											    <button class="btns" @click="reStoreToken(value.id)">{{langItem.game.reInvest}}</button>
+											</font>
+										</td>
+									</tr>
+									
+								</table>
+							</div>
+							
+
+							<div class="tab_box"  v-show="tabData.ecologyItem=='tokenRule'">
+								<!--rules start-->
+								<div class="rules">
+									<h3 class="rules_title">{{langItem.game.rule_title}}</h3>
+									<div class="rule_text">{{langItem.game.ecologyRule}}</div>
+								</div>
+							</div>
+							<!--rules end-->
+
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<!--join end-->
+           
+           <div class="rank mt30"><!--top -->
+           	    <div class="big_title">
+					<span></span>{{langItem.ranking.title}}<span></span>
+				</div>
+				
+				<div class="container">
+					<div class="block_item data_box">
+							
+							<h3><span @click="showPop('direcRule')">{{langItem.com.rule}}</span>{{langItem.detail.share_title}}</h3>
+							<ul>
+								<li>
+									<dl>
+										<dt>{{langItem.ranking.achievement}}：{{rankData.direct.achievement | numFilter}} ETH</dt>
+										<dd>
+							<table class="rank_list hero_list">
+                         	<thead>
+                         		<tr>
+                         			<th>{{langItem.ranking.rank_title}}</th>
+                         			<th>{{langItem.ranking.ac_title}}</th>
+                         			<th>ID</th>
+                         		</tr>
+                         	</thead>
+                         	<tbody>
+                         		<tr v-for="(value,index) in rankData.direct.top3">
+                         			<td>{{value.n}}</td>
+                         			<td>{{value.m | numFilter}} ETH</td>
+                         			<td>{{value.u}}</td>
+                         		</tr>
+                         	</tbody>
+                         </table>
+										</dd>
+									</dl>
+								</li>
+							
+								
+								
+							</ul>
+						</div>
+						
+						<div class="block_item data_box">
+							
+							<h3><span @click="showPop('topRule')">{{langItem.com.rule}}</span>{{langItem.ranking.small_title}}</h3>
+							<ul>
+								<li>
+									<dl>
+										<dt>{{langItem.ranking.Countdown}}：{{topTime}} {{langItem.game.day}} <a href="details.html" class="view_deail">{{langItem.com.detail}}</a></dt>
+										
+									</dl>
+								</li>
+							
+								
+								
+							</ul>
+						</div>
+					
+				</div>
+				
+           </div><!--top end-->
+
+			<div class="block_box">
+				<div class="container">
+					<!--statistics start-->
+
+					<div class="big_title">
+						<span></span>{{langItem.token.my}}<span></span>
+					</div>
+					<div class="my_level">
+						<span>
+							    {{langItem.statistics.my_level}} 
+							    <font>{{langItem.statistics.nodeName[otherData.grade]}}</font>
+							    <font v-if="otherData.superNode==1">，{{langItem.statistics.superNode}}</font>
+									
+						</span>
+					</div>
+
+					<div class="block_list">
+
+						<div class="block_item data_box">
+							<!--my income-->
+							<h3><span class="f13">{{langItem.income.base}}  {{income.staticRatio}}%</span>{{langItem.income.title}}</h3>
+							<ul>
+								<li>
+									<dl>
+										<dt>{{langItem.income.unsettled_income}}</dt>
+										<dd>ETH：{{income.unsettled.eth | numFilter}}</dd>
+										<dd>ZRO：{{income.unsettled.zro | numFilter}}</dd>
+										<dd>{{langItem.income.countDown}}：
+											<span v-if="income.limit==0">{{langItem.com.noInvest}}</span>
+											<span v-else id="coundDown"></span>
+										</dd>
+										<dd>
+											<button class="with_btn" @click="calcReward" v-if="income.unsettled.eth>0 || income.unsettled.zro >0">{{langItem.income.settle}}</button>
+										</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.income.gameReward_income}}</dt>
+										<dd>ETH：{{income.gameReward.eth | numFilter}}</dd>
+										<dd>ZRO：{{income.gameReward.zro | numFilter}}</dd>
+										<dd>{{langItem.income.fee}}：{{getFee}} ZRO</dd>
+										<dd><button class="with_btn" @click="outReward" v-if="income.gameReward.eth>0 || income.gameReward.zro >0">{{langItem.income.gameReward}}</button></dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.income.total_settled}}</dt>
+										<dd>ETH：{{income.settled.eth | numFilter}}</dd>
+										<dd>ZRO：{{income.settled.zro | numFilter}}</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.income.recentInvest}}</dt>
+										<dd>{{income.recent  | numFilter}} ETH</dd>
+									</dl>
+									
+									<dl>
+										<dt>{{times}} {{langItem.income.limit_income}}</dt>
+										<dd>{{income.limit | numFilter}} ETH</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.income.static_income}}</dt>
+										<dd>ETH：{{income.statics.eth | numFilter}}</dd>
+										<dd>ZRO：{{income.statics.zro | numFilter}}</dd>
+										
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.income.dynamic_income}} <a class="view_deail" href="details.html">{{langItem.com.detail}}</a></dt>
+										<dd>ETH：{{income.dynamic.eth | numFilter}}</dd>
+										<dd>ZRO：{{income.settled.zro | numFilter}}</dd>
+									</dl>
+								</li>
+								
+								
+							</ul>
+						</div>
+						<!--my income end-->
+
+						<div class="block_item data_box">
+							<!--my team-->
+							<h3><span><a href="details.html">{{langItem.team.viewDetail}}</a></span>{{langItem.team.my_team}}</h3>
+							<ul>
+								<li>
+									<dl>
+										<dt>{{langItem.team.direct_node}}</dt>
+										<dd>{{team.direct.nodes}}</dd>
+									</dl>
+								</li>
+							
+								<li>
+									<dl>
+										<dt>{{langItem.team.direct_achievement}}</dt>
+										<dd>{{langItem.team.invest}}：{{team.direct.invest | numFilter}} ETH</dd>
+										<dd>{{langItem.team.financial}}：{{team.direct.financial | numFilter}} ZRO</dd>
+									</dl>
+								</li>
+								
+							</ul>
+						</div>
+						<!--my team end-->
+
+		
+
+					</div>
+
+				</div>
+
+			</div>
+			<!--statistics end-->
+			
+			
+			<div class="block_box foot_bg">
+				<div class="container">
+					<!--statistics start-->
+
+					<div class="big_title">
+						<span></span>{{langItem.statistics.statistics}}<span></span>
+					</div>
+				
+
+					<div class="block_list"><!-- statistics -->
+
+						<div class="block_item data_box">
+							
+							
+							<ul>
+								<li>
+									<dl>
+										<dt>{{langItem.statistics.token_sales}}</dt>
+										<dd>{{statistics.tokenSales | numFilter}} ZRO</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.statistics.nodeName[2]}}</dt>
+										<dd>{{statistics.primary}}</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.statistics.burn_down}}</dt>
+										<dd>{{statistics.burnDown | numFilter}} ZRO</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.statistics.nodeName[3]}}</dt>
+										<dd>{{statistics.middle}}</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.statistics.todayCapital}}</dt>
+										<dd>{{statistics.capital | numFilter}} ETH</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.statistics.nodeName[4]}}</dt>
+										<dd>{{statistics.senior}}</dd>
+									</dl>
+								</li>
+							</ul>
+						</div>
+						<!--statistics end-->
+					</div>
+
+				</div>
+
+			</div>
+			<!--statistics end-->
+
+			<layer-up v-show="balanceError" :title="langItem.com.tip" :message="langItem.com.balanceError"></layer-up>
+			<layer-up v-show="canPlay" :title="langItem.com.tip" :message="langItem.game.canPlay"></layer-up>
+			<layer-up v-show="copySuccess" :title="langItem.com.tip" :message="langItem.com.copySuccess"></layer-up>
+			
+			
+			<layer-up v-show="lowerError" :title="langItem.com.tip" :message="langItem.com.lowerError"></layer-up>
+			<layer-up v-show="recommendError" :title="langItem.com.tip" :message="langItem.com.noId"></layer-up>
+			<layer-up v-show="countError" :title="langItem.com.tip" :message="langItem.com.count_error"></layer-up>
+			<layer-up v-show="quotaError" :title="langItem.com.tip" :message="langItem.com.quotaError"></layer-up>
+			<layer-up v-show="minCount" :title="langItem.com.tip" :message="langItem.com.minCount"></layer-up>
+			<layer-up v-show="zroBalanceError" :title="langItem.com.tip" :message="langItem.com.zroBalanceError"></layer-up>
+			
+			<layer-up v-show="futureRule" :title="langItem.com.rule" :message="langItem.game.futureRule"></layer-up>
+			<layer-up v-show="luckRule" :title="langItem.com.rule" :message="langItem.game.luckRule"></layer-up>
+			<layer-up v-show="topRule" :title="langItem.com.rule" :message="langItem.ranking.topRule"></layer-up>
+			<layer-up v-show="direcRule" :title="langItem.com.rule" :message="langItem.ranking.direcRule"></layer-up>
+			<layer-rank v-show="directPop" :title="{msg:langItem.ranking.rank3,rank:langItem.ranking.rank_title,achievement:langItem.ranking.ac_title,id:langItem.ranking.id}" :datafrom="rankData.direct.top3"></layer-rank>
+		</div>
+		<script type="text/javascript" src="javascript/index.js "></script>
+
+	</body>
+
+</html>

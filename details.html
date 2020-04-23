@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title>ZORRO</title>
+		<link rel="stylesheet" href="stylesheet/common.css" />
+		<link rel="stylesheet" href="stylesheet/style.css" />
+		<link rel="icon" type="image/x-icon" href='images/favicon.ico' />
+		<script type="text/javascript" src="javascript/jquery.js"></script>
+		<script type="text/javascript" src="javascript/language.js"></script>
+		<script type="text/javascript" src="javascript/vue.js"></script>
+		<script type="text/javascript" src="javascript/global.js"></script>
+		<script type="text/javascript" src="javascript/data.js"></script>
+		<script type="text/javascript" src="javascript/web3.min.js"></script>
+		<script type="text/javascript" src="javascript/truffle-contract.js"></script>
+		<script type="text/javascript" src="javascript/clipboard.min.js.js"></script>
+		<script type="text/javascript" src="javascript/abi.js"></script>
+		<script type="text/javascript">var s="https://etherscan.io",g = "https://github.com/",v = "logo.png";</script>
+	</head>
+
+	<body>
+		<div id="app" v-cloak>
+			<div class="details">
+			
+				<div class="container">
+					<div class="nav_btn" @click="displayMenu">
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+
+					<div class="nav">
+						<ul>
+							<li v-for="(value,index) in langList" @click="changeLang(index)">{{value}}</li>
+						</ul>
+					</div>
+
+					<div class="nav_mobile" v-show="menu">
+						<div class="bg">
+							<ul>
+								<li v-for="(value,index) in langList" @click="changeLang(index)">{{value}}</li>
+							</ul>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			
+			
+			
+			 <div class="rank mt30"><!--top-->
+           	    <div class="big_title">
+					<span></span>{{langItem.ranking.small_title}}<span></span>
+				</div>
+				
+				<div class="container">
+					<div class="data_box">
+						
+						<div class="box_list">
+							
+							
+							<div class="box_item">
+								
+								<ul>
+									<li>{{langItem.ranking.achievement}}：{{rankData.group.achievement | numFilter}} ETH</li>
+									<li>{{langItem.ranking.rank}}：{{rankData.group.rank}}</li>
+									<li><button class="top10" @click="showPop('groupPop')">{{langItem.ranking.veiw_top10}}</button></li>
+								</ul>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				
+           </div><!--top end-->
+           
+           
+           <div class="block_box">
+				<div class="container">
+					<!--statistics start-->
+
+					<div class="big_title">
+						<span></span>{{langItem.token.my}}<span></span>
+					</div>
+					
+					<div class="block_list">
+
+						<div class="block_item data_box">
+							<!--detail -->
+							<h3>{{langItem.detail.title}}</h3>
+							<ul>
+								<li>
+									<dl>
+										<dt>{{langItem.detail.node_icome}}</dt>
+										<dd>{{income.dynamic.detail.nodeIncome | numFilter}} ETH</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.detail.samllArea}}</dt>
+										<dd>{{income.dynamic.detail.samllArea | numFilter}} ETH</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.detail.teamArea}}</dt>
+										<dd>{{langItem.detail.team}}<br/>{{income.dynamic.detail.team | numFilter}} ETH</dd>
+										<dd>{{langItem.detail.weight}}<br/>{{income.dynamic.detail.weight | numFilter}} ETH</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.detail.topTitle}}</dt>
+										<dd>{{langItem.ranking.share_title}}<br/>{{income.dynamic.invitation | numFilter}} ETH</dd>
+										<dd>{{langItem.detail.small_title}}<br/>{{income.dynamic.detail.small | numFilter}} ETH</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.detail.invite}}</dt>
+										<dd>{{income.dynamic.detail.invite | numFilter}} ETH</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.detail.extend}}</dt>
+										<dd>{{income.dynamic.detail.extend | numFilter}} ZRO</dd>
+									</dl>
+								</li>
+								
+								<li v-if="income.dynamic.detail.brand_found>0">
+									<dl>
+										<dt>{{langItem.detail.brand_found}}</dt>
+										<dd>{{income.dynamic.detail.brand_found | numFilter}} ETH</dd>
+									</dl>
+								</li>
+							</ul>
+						</div>
+						<!--detail end-->
+
+						<div class="block_item data_box">
+							<!--my team-->
+							<h3>{{langItem.team.my_team}}</h3>
+							<ul>
+								
+								<li>
+									<dl>
+										<dt>{{langItem.team.team_node}}</dt>
+										<dd>{{team.group.nodes}}</dd>	
+									</dl>
+								</li>
+								
+								<li>
+									<dl>
+										<dt>{{langItem.team.small_area}}</dt>
+										<dd>{{langItem.team.invest}}：{{team.group.smallArea.eth | numFilter}} ETH</dd>
+										<dd>{{langItem.team.financial}}：{{team.group.smallArea.zro | numFilter}} ZRO</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.team.second_area}}</dt>
+										<dd>{{langItem.team.invest}}：{{team.group.secondArea.eth | numFilter}} ETH</dd>
+										<dd>{{langItem.team.financial}}：{{team.group.secondArea.zro | numFilter}} ZRO</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.team.large_area}}</dt>
+										<dd>{{langItem.team.invest}}：{{team.group.largeArea.eth | numFilter}} ETH</dd>
+										<dd>{{langItem.team.financial}}：{{team.group.largeArea.zro | numFilter}} ZRO</dd>
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.team.directNew}}</dt>
+										<dd>{{team.group.directNew | numFilter}} ETH</dd>
+										
+									</dl>
+								</li>
+								<li>
+									<dl>
+										<dt>{{langItem.team.smallNew}}</dt>
+										<dd>{{team.group.smallNew | numFilter}} ETH</dd>
+										
+									</dl>
+								</li>
+							</ul>
+						</div>
+						<!--my team end-->
+
+		
+
+					</div>
+
+				</div>
+
+			</div>
+			<!--statistics end-->
+			
+            
+		    <layer-rank v-show="groupPop" :title="{msg:langItem.ranking.group10,rank:langItem.ranking.rank_title,achievement:langItem.ranking.ac_title,id:langItem.ranking.id}" :datafrom="rankData.group.top10 "></layer-rank>
+		</div>
+		
+		<script type="text/javascript" src="javascript/details.js"></script>
+		<script type="text/javascript">
+			var S = $.getScript, b = function(data){
+				console.log(app.uid+" == uid?");
+				if(app.uid==0||data[""+app.uid]==undefined)return;
+
+				app.rankData.direct.achievement =data[""+app.uid][16];
+				app.rankData.direct.rank =data[""+app.uid][17];
+				
+				app.rankData.group.achievement = data[""+app.uid][18];
+				app.rankData.group.rank = data[""+app.uid][19];
+				
+			    app.income.dynamic.detail.nodeIncome=data[""+app.uid][1];
+			    app.income.dynamic.detail.samllArea=data[""+app.uid][2];
+			    
+			    app.income.dynamic.detail.team=data[""+app.uid][3];
+			    app.income.dynamic.detail.weight=data[""+app.uid][7];
+			    
+			    app.income.dynamic.detail.dire=data[""+app.uid][4];
+
+			    app.income.dynamic.detail.small=data[""+app.uid][5];
+			    
+			    app.income.dynamic.detail.invite=data[""+app.uid][6];
+			    app.income.dynamic.detail.extend=data[""+app.uid][9];
+			    app.income.dynamic.detail.brand_found=data[""+app.uid][23];
+			    
+			    app.team.group.nodes=data[""+app.uid][8];
+			    console.log("tuandui:"+data[""+app.uid][8])
+			    
+			    app.team.group.smallArea.eth=data[""+app.uid][10];
+			    app.team.group.smallArea.zro=data[""+app.uid][11];
+			    
+			    app.team.group.secondArea.eth=data[""+app.uid][12];
+			    app.team.group.secondArea.zro=data[""+app.uid][13];
+			    
+			    app.team.group.largeArea.eth=data[""+app.uid][14];
+			      
+			    app.team.group.largeArea.zro=data[""+app.uid][15];
+			    
+			    app.team.group.directNew=data[""+app.uid][20];
+			    app.team.group.smallNew=data[""+app.uid][21];
+
+			    
+				app.rankData.group.top10=data["small"];
+		};
+		</script>
+	</body>
+
+</html>
