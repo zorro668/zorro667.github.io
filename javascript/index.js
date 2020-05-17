@@ -106,6 +106,7 @@ var app = new Vue({
 			_t.getUserInfo();
 			_t.getGameInfo();
 			_t.getURL();
+			_t.getStaticReward();
 			
 			setTimeout(function() {
 				_t.getRecord();
@@ -120,6 +121,7 @@ var app = new Vue({
 				_t.getGameInfo();
 				_t.getRecord();
 				_t.getURL();
+				_t.getStaticReward();
 				
 
 			}, 30000);
@@ -372,7 +374,28 @@ var app = new Vue({
 			});
 
 		},
+        getStaticReward: function() {
+			var _t = this,
+				account = web3.eth.coinbase;
+			_t.contracts.game.deployed().then(function(instance) {
+				contract = instance;
+				return contract.getStaticReward(account)
+			}).then(function(result) {
 
+               if(result[0]==0){
+               	   realStatic=0
+               }else if( _t.income.recent==0){
+               	  realStatic=0 
+               }else{
+               	  var todayStatic=result[1]/10**18/result[0];
+               	  _t.realStatic=(todayStatic / _t.income.recent) *100/ _t.income.staticRatio;
+               }
+                
+			}).catch(function(err) {
+				console.log(err.message + " at getStaticReward error");
+			});
+
+		},
 		getUserInfo: function() { 
 			var _t = this,
 				account = web3.eth.coinbase;

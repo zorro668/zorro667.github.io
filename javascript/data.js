@@ -151,4 +151,5 @@ var data = {
 	whitePaper:"",
 	video:"",
 	ppt:"",
+	realStatic:"--",
 }
