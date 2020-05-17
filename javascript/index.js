@@ -383,9 +383,9 @@ var app = new Vue({
 			}).then(function(result) {
 
                if(result[0]==0){
-               	   realStatic=0
+               	   _t.realStatic=0
                }else if( _t.income.recent==0){
-               	  realStatic=0 
+               	  _t.realStatic=0 
                }else{
                	  var todayStatic=result[1]/10**18/result[0];
                	  _t.realStatic=(todayStatic / _t.income.recent) *100/ _t.income.staticRatio;
